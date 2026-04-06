@@ -5,7 +5,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+
 #include "ThreadPool.h"
+#include "KVStore.h"
 
 int main() {
 
@@ -44,7 +46,8 @@ int main() {
 
     std::cout << "Multithreaded KVForge Echo Server listening on port 8080..." << std::endl;
 
-    ThreadPool pool(4);
+    KVStore db;
+    ThreadPool pool(4, db);
 
     //Leader thread Loop
     while(true){

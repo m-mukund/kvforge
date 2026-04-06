@@ -1,5 +1,7 @@
 #pragma once
 
+#include "KVStore.h"
+
 #include <vector>
 #include <thread>
 #include <queue>
@@ -8,13 +10,16 @@
 
 class ThreadPool{
 public:
-    explicit ThreadPool(size_t num_threads);
+    explicit ThreadPool(size_t num_threads, KVStore& db);
 
     ~ThreadPool();
 
     void enqueue(int client_socket);
 
 private:
+
+    KVStore& db;
+
     std::vector<std::thread> workers;
     std::queue<int> tasks;
 

@@ -1,10 +1,16 @@
 #include "ThreadPool.h"
+#include "KVStore.h"
 #include <iostream>
+#include <iterator>
 #include <mutex>
+#include <optional>
+#include <sstream>
+#include <string>
 #include <unistd.h>
 #include <sys/socket.h>
 
-ThreadPool::ThreadPool(size_t num_threads): stop(false){
+ThreadPool::ThreadPool(size_t num_threads, KVStore& db): db(db), stop(false){
+
     for(int i=0;i<num_threads;i++){
         workers.emplace_back([this]{this->worker_loop();});
     }
@@ -63,7 +69,44 @@ void ThreadPool::handle_client(int client_socket) {
             break; 
         }
         buffer[bytes_read] = '\0';
-        write(client_socket, buffer, bytes_read);
+
+        std::string request(buffer);
+        std::string response;
+        // TODO 1: Tokenize the request string.
+        // C++ doesn't have a built-in split() function. 
+        // Hint: Use std::istringstream to split the 'request' string by spaces 
+        // and push the resulting words into a std::vector<std::string> called 'tokens'.
+        std::istringstream iss(request);
+
+        std::vector<std::string> tokens{std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>()};
+        if(tokens.empty())
+            continue;
+
+        if(tokens[0]=="SET"&&tokens.size()>=3){
+            db.set(tokens[1], tokens[2]);
+            response="OK\n";
+        }
+        else if(tokens[0]=="GET"&&tokens.size()>=2){
+            std::optional<std::string> val1=db.get(tokens[1]);
+            if(!val1)
+                response="(nil)\n";
+            else
+                response=*val1+"\n";
+        }
+        else if (tokens[0]=="DEL"&&tokens.size()>=2) {
+            bool del_status=db.del(tokens[1]);
+            if(del_status)
+                response="1\n";
+            else
+                response="0\n";
+        }
+        else {
+            response="ERROR: Invalid Command/ Parameters\n";
+        }
+
+        
+
+        write(client_socket, response.c_str(), response.size());
     }
     close(client_socket);
 }
