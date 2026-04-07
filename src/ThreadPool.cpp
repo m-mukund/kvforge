@@ -72,10 +72,6 @@ void ThreadPool::handle_client(int client_socket) {
 
         std::string request(buffer);
         std::string response;
-        // TODO 1: Tokenize the request string.
-        // C++ doesn't have a built-in split() function. 
-        // Hint: Use std::istringstream to split the 'request' string by spaces 
-        // and push the resulting words into a std::vector<std::string> called 'tokens'.
         std::istringstream iss(request);
 
         std::vector<std::string> tokens{std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>()};
