@@ -31,4 +31,5 @@ private:
 
     void handle_client(int client_socket);
 
+    std::vector<std::string> parse_resp(const std::string& buffer);
 };
