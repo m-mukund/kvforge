@@ -5,6 +5,7 @@
 #include <vector>
 #include <fstream>
 #include <mutex>
+#include "KVStore.h"
 
 class StorageManager{
 private:
@@ -16,6 +17,8 @@ public:
     ~StorageManager();
 
     void append_command(const std::vector<std::string>& tokens);
+
+    void load_aof(KVStore& db);
 
 };
 

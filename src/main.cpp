@@ -12,6 +12,11 @@
 
 int main() {
 
+    KVStore db;
+    StorageManager aof("appendonly.aof");
+
+    aof.load_aof(db);
+
     int server_fd=socket(AF_INET, SOCK_STREAM, 0);
     if(server_fd==-1){
         std::cerr<<"Failed Socket Creation\n";
@@ -47,8 +52,7 @@ int main() {
 
     std::cout << "Multithreaded KVForge Echo Server listening on port 8080..." << std::endl;
 
-    KVStore db;
-    StorageManager aof("appendonly.aof");
+    
     ThreadPool pool(4, db, aof);
 
     //Leader thread Loop
