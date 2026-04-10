@@ -1,6 +1,7 @@
 #pragma once
 
 #include "KVStore.h"
+#include "StorageManager.h"
 
 #include <vector>
 #include <thread>
@@ -10,7 +11,7 @@
 
 class ThreadPool{
 public:
-    explicit ThreadPool(size_t num_threads, KVStore& db);
+    explicit ThreadPool(size_t num_threads, KVStore& db, StorageManager& storage);
 
     ~ThreadPool();
 
@@ -19,6 +20,7 @@ public:
 private:
 
     KVStore& db;
+    StorageManager& storage;
 
     std::vector<std::thread> workers;
     std::queue<int> tasks;

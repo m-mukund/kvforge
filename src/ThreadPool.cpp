@@ -1,5 +1,6 @@
 #include "ThreadPool.h"
 #include "KVStore.h"
+#include "StorageManager.h"
 #include <iostream>
 #include <iterator>
 #include <mutex>
@@ -10,7 +11,7 @@
 #include <sys/socket.h>
 #include <vector>
 
-ThreadPool::ThreadPool(size_t num_threads, KVStore& db): db(db), stop(false){
+ThreadPool::ThreadPool(size_t num_threads, KVStore& db, StorageManager& storage): db(db), stop(false), storage(storage){
 
     for(int i=0;i<num_threads;i++){
         workers.emplace_back([this]{this->worker_loop();});
@@ -124,6 +125,7 @@ void ThreadPool::handle_client(int client_socket) {
 
         if(tokens[0]=="SET"&&tokens.size()>=3){
             db.set(tokens[1], tokens[2]);
+            storage.append_command(tokens);
             response="+OK\r\n";
         }
         else if(tokens[0]=="GET"&&tokens.size()>=2){
@@ -135,8 +137,10 @@ void ThreadPool::handle_client(int client_socket) {
         }
         else if (tokens[0]=="DEL"&&tokens.size()>=2) {
             bool del_status=db.del(tokens[1]);
-            if(del_status)
+            if(del_status){
+                storage.append_command(tokens);
                 response=":1\r\n";
+            }
             else
                 response=":0\r\n";
         }

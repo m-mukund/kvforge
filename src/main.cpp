@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
+#include "StorageManager.h"
 #include "ThreadPool.h"
 #include "KVStore.h"
 
@@ -47,7 +48,8 @@ int main() {
     std::cout << "Multithreaded KVForge Echo Server listening on port 8080..." << std::endl;
 
     KVStore db;
-    ThreadPool pool(4, db);
+    StorageManager aof("appendonly.aof");
+    ThreadPool pool(4, db, aof);
 
     //Leader thread Loop
     while(true){
