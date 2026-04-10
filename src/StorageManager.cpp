@@ -8,6 +8,7 @@
 #include <string>
 
 StorageManager::StorageManager(const std::string& filename) {
+    this->filename=filename;
     aof_file.open(filename, std::ios::app);
 }
 
@@ -42,10 +43,12 @@ void StorageManager::append_command(const std::vector<std::string>& tokens) {
 }
 
 void StorageManager::load_aof(KVStore& db){
-    std::ifstream file("appendonly.aof", std::ios::binary);
+    std::ifstream file(filename, std::ios::binary);
 
-    if (!file.is_open())
+    if (!file.is_open()){
+        std::cout << "No AOF file found. Starting with empty database.\n";
         return;
+    }
 
     std::string buffer((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 

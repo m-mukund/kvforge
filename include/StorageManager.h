@@ -9,6 +9,7 @@
 
 class StorageManager{
 private:
+    std::string filename;
     std::ofstream aof_file;
     std::mutex file_mutex;
 
