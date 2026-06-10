@@ -1,0 +1,31 @@
+name: C++ CI
+
+# Trigger the workflow on pushes and pull requests to the main branch
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    # Use the latest Ubuntu environment
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Download your code onto the GitHub server
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Step 2: Create the build folder and generate Makefiles
+    - name: Configure CMake
+      run: cmake -B build
+
+    # Step 3: Compile the project (using 4 cores for speed)
+    - name: Build
+      run: cmake --build build --parallel 4
+
+    # Step 4: Run your GoogleTests!
+    - name: Run Tests
+      working-directory: ${{github.workspace}}/build
+      run: ./KVForgeTests
